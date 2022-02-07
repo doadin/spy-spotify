@@ -92,6 +92,7 @@ namespace EspionSpotify
         {
             tcMenu.SelectedIndex = Settings.Default.app_tab_number_selected;
 
+            rbFlac.Checked = Settings.Default.settings_media_audio_format == (int)MediaFormat.Flac;
             rbMp3.Checked = Settings.Default.settings_media_audio_format == (int)MediaFormat.Mp3;
             rbWav.Checked = Settings.Default.settings_media_audio_format == (int)MediaFormat.Wav;
             tbMinTime.Value = Settings.Default.settings_media_minimum_recorded_length_in_seconds / 5;
@@ -607,7 +608,7 @@ namespace EspionSpotify
         private void RbFormat_CheckedChanged(object sender, EventArgs e)
         {
             var rb = sender as RadioButton;
-            var mediaFormatIndex = (int)(rbMp3.Checked ? MediaFormat.Mp3 : MediaFormat.Wav);
+            var mediaFormatIndex = (int)(rbFlac.Checked ? MediaFormat.Flac : rbMp3.Checked ? MediaFormat.Mp3 : MediaFormat.Wav);
             if (Settings.Default.settings_media_audio_format == mediaFormatIndex || !rb.Checked) return;
 
             var mediaFormat = rb?.Tag?.ToString().ToMediaFormat() ?? MediaFormat.Mp3;

@@ -3,6 +3,7 @@ using EspionSpotify.Enums;
 using EspionSpotify.Extensions;
 using EspionSpotify.Models;
 using EspionSpotify.Native;
+using NAudio.Flac;
 using NAudio.Lame;
 using NAudio.Wave;
 using System;
@@ -279,6 +280,8 @@ namespace EspionSpotify
         {
             switch (_userSettings.MediaFormat)
             {
+                case MediaFormat.Flac:
+                    return new FlacFrame(stream);
                 case MediaFormat.Mp3:
                     var supportedWaveFormat = GetWaveFormatMP3Supported(waveFormat);
                     return new LameMP3FileWriter(stream, supportedWaveFormat, _userSettings.Bitrate);
@@ -298,6 +301,24 @@ namespace EspionSpotify
             var waveIn = new WasapiLoopbackCapture(audioSession.AudioMMDevicesManager.AudioEndPointDevice);
             switch (settings.MediaFormat)
             {
+                case MediaFormat.Flac:
+                    try
+                    {
+                        using (var writer = new FlacFrame(new MemoryStream())) return true;
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        return LogLameMP3FileWriterArgumentException(form, ex, waveIn.WaveFormat);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return LogLameMP3FileWriterArgumentException(form, ex, waveIn.WaveFormat);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogLameMP3FileWriterException(form, ex);
+                        return false;
+                    }
                 case MediaFormat.Mp3:
                     try
                     {
